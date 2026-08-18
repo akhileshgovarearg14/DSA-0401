@@ -1,0 +1,45 @@
+import numpy as np
+
+# Runtime input
+cars = int(input("Enter number of car models: "))
+
+fuel_efficiency = []
+
+print("\nEnter fuel efficiency (MPG):")
+
+for i in range(cars):
+    mpg = float(input(f"Enter MPG for Car Model {i + 1}: "))
+    fuel_efficiency.append(mpg)
+
+# Convert to NumPy array
+fuel_efficiency = np.array(fuel_efficiency)
+
+# Calculate average fuel efficiency
+average_efficiency = np.mean(fuel_efficiency)
+
+print("\nFuel Efficiency:")
+print(fuel_efficiency)
+
+print("\nAverage Fuel Efficiency:")
+print(average_efficiency, "MPG")
+
+# Select two car models for comparison
+model1 = int(input("\nEnter first car model number: "))
+model2 = int(input("Enter second car model number: "))
+
+# Convert model number to array index
+efficiency1 = fuel_efficiency[model1 - 1]
+efficiency2 = fuel_efficiency[model2 - 1]
+
+# Percentage improvement
+percentage_improvement = ((efficiency2 - efficiency1) /
+                          efficiency1) * 100
+
+print("\nFirst Car Model Efficiency:")
+print(efficiency1, "MPG")
+
+print("Second Car Model Efficiency:")
+print(efficiency2, "MPG")
+
+print("\nPercentage Improvement:")
+print(percentage_improvement, "%")
