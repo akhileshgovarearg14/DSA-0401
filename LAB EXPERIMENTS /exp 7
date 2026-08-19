@@ -1,0 +1,64 @@
+# Import Pandas
+import pandas as pd
+
+# Get number of orders
+n = int(input("Enter the number of orders: "))
+
+# Create empty lists
+customer_id = []
+order_date = []
+product_name = []
+order_quantity = []
+
+# Runtime input
+print("\nEnter Order Details:")
+
+for i in range(n):
+    print(f"\nOrder {i + 1}")
+
+    customer_id.append(int(input("Enter Customer ID: ")))
+    order_date.append(input("Enter Order Date (YYYY-MM-DD): "))
+    product_name.append(input("Enter Product Name: "))
+    order_quantity.append(int(input("Enter Order Quantity: ")))
+
+# Create DataFrame
+data = {
+    "Customer_ID": customer_id,
+    "Order_Date": order_date,
+    "Product_Name": product_name,
+    "Order_Quantity": order_quantity
+}
+
+order_data = pd.DataFrame(data)
+
+# Convert Order_Date column to datetime format
+order_data["Order_Date"] = pd.to_datetime(order_data["Order_Date"])
+
+# Display the dataset
+print("\nOrder Data:\n")
+print(order_data)
+
+# ---------------------------------------------------
+# 1. Total number of orders made by each customer
+# ---------------------------------------------------
+orders_per_customer = order_data.groupby("Customer_ID").size()
+
+print("\n1. Total Number of Orders Made by Each Customer:\n")
+print(orders_per_customer)
+
+# ---------------------------------------------------
+# 2. Average order quantity for each product
+# ---------------------------------------------------
+average_quantity = order_data.groupby("Product_Name")["Order_Quantity"].mean()
+
+print("\n2. Average Order Quantity for Each Product:\n")
+print(average_quantity)
+
+# ---------------------------------------------------
+# 3. Earliest and Latest Order Dates
+# ---------------------------------------------------
+earliest_date = order_data["Order_Date"].min()
+latest_date = order_data["Order_Date"].max()
+
+print("\n3. Earliest Order Date:", earliest_date.date())
+print("Latest Order Date:", latest_date.date())
