@@ -1,0 +1,52 @@
+# Import Pandas
+import pandas as pd
+
+# Get number of orders
+n = int(input("Enter the number of orders: "))
+
+# Create empty lists
+order_id = []
+product_name = []
+quantity_sold = []
+order_date = []
+
+# Get runtime input
+print("\nEnter Sales Details:")
+
+for i in range(n):
+    print(f"\nOrder {i + 1}")
+
+    order_id.append(int(input("Enter Order ID: ")))
+    product_name.append(input("Enter Product Name: "))
+    quantity_sold.append(int(input("Enter Quantity Sold: ")))
+    order_date.append(input("Enter Order Date (YYYY-MM-DD): "))
+
+# Create DataFrame
+data = {
+    "Order_ID": order_id,
+    "Product_Name": product_name,
+    "Quantity_Sold": quantity_sold,
+    "Order_Date": order_date
+}
+
+sales_data = pd.DataFrame(data)
+
+# Convert Order_Date to datetime
+sales_data["Order_Date"] = pd.to_datetime(sales_data["Order_Date"])
+
+# Display the sales data
+print("\nSales Data:\n")
+print(sales_data)
+
+# ----------------------------------------------------
+# Find the Top 5 Products Sold the Most
+# ----------------------------------------------------
+top_5_products = (
+    sales_data.groupby("Product_Name")["Quantity_Sold"]
+    .sum()
+    .sort_values(ascending=False)
+    .head(5)
+)
+
+print("\nTop 5 Products Sold the Most:\n")
+print(top_5_products)
