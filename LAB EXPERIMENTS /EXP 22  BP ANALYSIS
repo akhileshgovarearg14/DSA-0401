@@ -1,0 +1,68 @@
+You are a medical researcher investigating the effectiveness of a new drug in reducing blood pressure.
+You conduct a clinical trial with a sample of 50 patients who were randomly assigned to receive either
+the new drug or a placebo. After measuring their blood pressure levels at the end of the trial, you obtain
+the data for both groups. Now, you want to determine the confidence intervals for the mean reduction
+in blood pressure for both the drug and placebo groups.
+Question:
+"What is the 95% confidence interval for the mean reduction in blood pressure for patients who
+received the new drug? Also, what is the 95% confidence interval for the mean reduction in blood
+pressure for patients who received the placebo?
+
+import numpy as np
+from scipy import stats
+
+# Runtime input
+n_drug = int(input("Enter number of patients in drug group: "))
+drug = list(map(float, input(
+    f"Enter blood pressure reductions for {n_drug} drug patients: "
+).split()))
+
+n_placebo = int(input("Enter number of patients in placebo group: "))
+placebo = list(map(float, input(
+    f"Enter blood pressure reductions for {n_placebo} placebo patients: "
+).split()))
+
+# Check input
+if len(drug) != n_drug or len(placebo) != n_placebo:
+    print("Error: Number of values does not match the number of patients.")
+else:
+    confidence = 0.95
+
+    # Drug group
+    drug_mean = np.mean(drug)
+    drug_std = np.std(drug, ddof=1)
+    drug_se = drug_std / np.sqrt(n_drug)
+
+    drug_t = stats.t.ppf(0.975, n_drug - 1)
+
+    drug_margin = drug_t * drug_se
+
+    drug_lower = drug_mean - drug_margin
+    drug_upper = drug_mean + drug_margin
+
+    # Placebo group
+    placebo_mean = np.mean(placebo)
+    placebo_std = np.std(placebo, ddof=1)
+    placebo_se = placebo_std / np.sqrt(n_placebo)
+
+    placebo_t = stats.t.ppf(0.975, n_placebo - 1)
+
+    placebo_margin = placebo_t * placebo_se
+
+    placebo_lower = placebo_mean - placebo_margin
+    placebo_upper = placebo_mean + placebo_margin
+
+    # Output
+    print("\n----- 95% CONFIDENCE INTERVAL RESULTS -----")
+
+    print("\nDrug Group:")
+    print("Mean reduction =", round(drug_mean, 2))
+    print("Standard deviation =", round(drug_std, 2))
+    print("95% Confidence Interval = (",
+          round(drug_lower, 2), ",", round(drug_upper, 2), ")")
+
+    print("\nPlacebo Group:")
+    print("Mean reduction =", round(placebo_mean, 2))
+    print("Standard deviation =", round(placebo_std, 2))
+    print("95% Confidence Interval = (",
+          round(placebo_lower, 2), ",", round(placebo_upper, 2), ")")
