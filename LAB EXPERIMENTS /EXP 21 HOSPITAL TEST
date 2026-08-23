@@ -1,0 +1,66 @@
+21.Scenario: Suppose a hospital tested the age and body fat data for 18 randomly selected adults with
+the following result.
+
+Question:
+• Calculate the mean, median and standard deviation of age and %fat using Pandas.
+
+• Draw the boxplots for age and %fat.
+• Draw a scatter plot and a q-q plot based on these two variables
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import scipy.stats as stats
+
+# Runtime input
+age = list(map(float, input("Enter age of 18 adults separated by spaces: ").split()))
+fat = list(map(float, input("Enter %fat of 18 adults separated by spaces: ").split()))
+
+# Check input
+if len(age) != 18 or len(fat) != 18:
+    print("Error: Please enter exactly 18 values for both age and %fat.")
+else:
+    # Create DataFrame
+    data = pd.DataFrame({
+        "Age": age,
+        "%Fat": fat
+    })
+
+    # Statistical calculations
+    print("\nData:")
+    print(data)
+
+    print("\nMean:")
+    print(data.mean())
+
+    print("\nMedian:")
+    print(data.median())
+
+    print("\nStandard Deviation:")
+    print(data.std())
+
+    # Boxplots
+    plt.figure(figsize=(8, 5))
+    data.boxplot(column=["Age", "%Fat"])
+    plt.title("Boxplot of Age and %Fat")
+    plt.ylabel("Values")
+    plt.show()
+
+    # Scatter plot
+    plt.figure(figsize=(7, 5))
+    plt.scatter(data["Age"], data["%Fat"])
+    plt.xlabel("Age")
+    plt.ylabel("%Fat")
+    plt.title("Scatter Plot: Age vs %Fat")
+    plt.grid(True)
+    plt.show()
+
+    # Q-Q plots
+    plt.figure(figsize=(7, 5))
+    stats.probplot(data["Age"], dist="norm", plot=plt)
+    plt.title("Q-Q Plot for Age")
+    plt.show()
+
+    plt.figure(figsize=(7, 5))
+    stats.probplot(data["%Fat"], dist="norm", plot=plt)
+    plt.title("Q-Q Plot for %Fat")
+    plt.show()
