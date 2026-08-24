@@ -1,0 +1,113 @@
+"""28.Scenario: Classification and Regression Trees (CART) for Car Price Prediction
+You are working for a car dealership, and you want to predict the price of used cars based on various
+features such as the car's mileage, age, brand, and engine type. You have collected a dataset of used
+cars with their respective prices.
+Write a Python program that loads the car dataset and allows the user to input the features of a new car
+they want to sell. The program should use the Classification and Regression Trees (CART) algorithm
+from scikit-learn to predict the price of the new car based on the input features. The CART algorithm
+will create a tree-based model that will split the data into subsets based on the chosen features and their
+values, leading to a decision path that eventually predicts the price of the car. The program should
+output the predicted price and display the decision path (the sequence of conditions leading to the
+prediction) for the new car."""
+
+import pandas as pd
+from sklearn.tree import DecisionTreeRegressor
+
+# Load dataset
+data = pd.read_csv("car_dataset.csv")
+
+print("----- CAR DATASET -----")
+print(data)
+
+# Convert categorical columns into dummy variables
+data_encoded = pd.get_dummies(
+    data,
+    columns=["Brand", "Engine_Type"]
+)
+
+# Separate input and output
+X = data_encoded.drop("Price", axis=1)
+y = data_encoded["Price"]
+
+# Train CART regression tree
+model = DecisionTreeRegressor(
+    criterion="squared_error",
+    max_depth=4,
+    random_state=42
+)
+
+model.fit(X, y)
+
+# Runtime input
+print("\n----- ENTER NEW CAR DETAILS -----")
+
+mileage = float(input("Enter mileage: "))
+age = float(input("Enter car age in years: "))
+brand = input("Enter brand: ")
+engine = input("Enter engine type: ")
+
+# Create new car DataFrame
+new_car = pd.DataFrame([{
+    "Mileage": mileage,
+    "Age": age,
+    "Brand": brand,
+    "Engine_Type": engine
+}])
+
+# Encode new car
+new_car = pd.get_dummies(
+    new_car,
+    columns=["Brand", "Engine_Type"]
+)
+
+# Make columns same as training data
+new_car = new_car.reindex(
+    columns=X.columns,
+    fill_value=False
+)
+
+# Prediction
+predicted_price = model.predict(new_car)[0]
+
+print("\n----- PREDICTION -----")
+print("Predicted car price: ₹", round(predicted_price, 2))
+
+# Decision path
+node_indicator = model.decision_path(new_car)
+leaf_id = model.apply(new_car)
+
+print("\n----- DECISION PATH -----")
+
+feature = model.tree_.feature
+threshold = model.tree_.threshold
+
+node_index = node_indicator.indices[
+    node_indicator.indptr[0]:
+    node_indicator.indptr[1]
+]
+
+for node_id in node_index:
+
+    if leaf_id[0] == node_id:
+        print("Reached leaf node.")
+        print("Predicted price = ₹", round(predicted_price, 2))
+        break
+
+    feature_name = X.columns[feature[node_id]]
+    threshold_value = threshold[node_id]
+    value = new_car.iloc[0][feature_name]
+
+    if value <= threshold_value:
+        print(
+            feature_name,
+            "<=",
+            round(threshold_value, 2),
+            "→ Go LEFT"
+        )
+    else:
+        print(
+            feature_name,
+            ">",
+            round(threshold_value, 2),
+            "→ Go RIGHT"
+        )
