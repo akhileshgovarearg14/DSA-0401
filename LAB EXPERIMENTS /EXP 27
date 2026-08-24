@@ -1,0 +1,113 @@
+27. Scenario: You are a data analyst working for a sports analytics company. The company has
+collected data on various soccer players, including their names, ages, positions, number of goals
+scored, and weekly salaries. Create dataset on your own and store in a CSV file.
+Question: Develop a Python program to read the data from the CSV file into a pandas data frame,
+to find the top 5 players with the highest number of goals scored and the top 5 players with the
+highest salaries. Also calculate the average age of players and display the names of players who are
+above the average age and visualize the distribution of players based on their positions using a bar
+chart.
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Create soccer player dataset
+data = {
+    "Name": [
+        "Lionel", "Cristiano", "Neymar", "Mbappe", "Haaland",
+        "De Bruyne", "Salah", "Vinicius", "Bellingham", "Kane",
+        "Son", "Modric", "Saka", "Foden", "Lewandowski"
+    ],
+
+    "Age": [
+        38, 41, 34, 27, 26,
+        35, 34, 26, 23, 33,
+        34, 40, 24, 25, 37
+    ],
+
+    "Position": [
+        "Forward", "Forward", "Forward", "Forward", "Forward",
+        "Midfielder", "Forward", "Forward", "Midfielder",
+        "Forward", "Forward", "Midfielder", "Forward",
+        "Midfielder", "Forward"
+    ],
+
+    "Goals": [
+        20, 25, 18, 30, 32,
+        12, 24, 22, 15, 27,
+        19, 8, 16, 14, 23
+    ],
+
+    "Weekly_Salary": [
+        900000, 1200000, 700000, 1100000, 1000000,
+        850000, 800000, 750000, 650000, 950000,
+        600000, 500000, 450000, 400000, 700000
+    ]
+}
+
+# Create DataFrame
+df = pd.DataFrame(data)
+
+# Save dataset to CSV
+df.to_csv("soccer_players.csv", index=False)
+
+print("Dataset created successfully.")
+print("CSV file: soccer_players.csv")
+
+# Read CSV file
+players = pd.read_csv("soccer_players.csv")
+
+print("\n----- SOCCER PLAYER DATA -----")
+print(players)
+
+# Top 5 players by goals
+top_goals = players.sort_values(
+    by="Goals",
+    ascending=False
+).head(5)
+
+print("\n----- TOP 5 PLAYERS BY GOALS -----")
+print(top_goals[["Name", "Goals"]])
+
+# Top 5 players by salary
+top_salary = players.sort_values(
+    by="Weekly_Salary",
+    ascending=False
+).head(5)
+
+print("\n----- TOP 5 PLAYERS BY SALARY -----")
+print(top_salary[["Name", "Weekly_Salary"]])
+
+# Average age
+average_age = players["Age"].mean()
+
+print("\nAverage age of players:",
+      round(average_age, 2))
+
+# Players above average age
+above_average = players[
+    players["Age"] > average_age
+]
+
+print("\n----- PLAYERS ABOVE AVERAGE AGE -----")
+print(above_average[["Name", "Age"]])
+
+# Position distribution
+position_count = players["Position"].value_counts()
+
+print("\n----- POSITION DISTRIBUTION -----")
+print(position_count)
+
+# Bar chart
+plt.figure(figsize=(8, 5))
+
+position_count.plot(
+    kind="bar"
+)
+
+plt.title("Distribution of Soccer Players by Position")
+plt.xlabel("Position")
+plt.ylabel("Number of Players")
+plt.xticks(rotation=0)
+plt.grid(axis="y")
+
+plt.show()
