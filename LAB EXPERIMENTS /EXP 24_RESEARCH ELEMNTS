@@ -1,0 +1,74 @@
+24.Scenario:You are a scientist conducting research on rare elements found in a specific region. Your
+goal is to estimate the average concentration of a rare element in the region using a random sample of
+measurements. You will use the NumPy library to perform point estimation and calculate confidence
+intervals for the population mean.The rare element concentration data is stored in a CSV file named
+"rare_elements.csv," where each row contains a single measurement of the concentration.
+Question:
+write a Python program that allows the user to input the sample size, confidence level, and desired
+level of precision.
+
+import numpy as np
+import pandas as pd
+from scipy.stats import norm
+
+# Read CSV file
+data = pd.read_csv("rare_elements.csv")
+
+# Convert first column to NumPy array
+population_data = data.iloc[:, 0].dropna().to_numpy()
+
+# Runtime input
+n = int(input("Enter sample size: "))
+confidence = float(input("Enter confidence level (example: 95): "))
+precision = float(input("Enter desired level of precision: "))
+
+# Check sample size
+if n > len(population_data):
+    print("Error: Sample size is greater than the available data.")
+else:
+    # Random sample
+    sample = np.random.choice(population_data, size=n, replace=False)
+
+    # Point estimation
+    sample_mean = np.mean(sample)
+    sample_std = np.std(sample, ddof=1)
+
+    # Significance level
+    alpha = 1 - confidence / 100
+
+    # Z critical value
+    z_value = norm.ppf(1 - alpha / 2)
+
+    # Margin of error
+    margin_error = z_value * (sample_std / np.sqrt(n))
+
+    # Confidence interval
+    lower = sample_mean - margin_error
+    upper = sample_mean + margin_error
+
+    # Output
+    print("\n----- RARE ELEMENT ESTIMATION -----")
+
+    print("Sample size:", n)
+    print("Confidence level:", confidence, "%")
+    print("Desired precision:", precision)
+
+    print("\nSample mean (Point Estimate):",
+          round(sample_mean, 4))
+
+    print("Sample standard deviation:",
+          round(sample_std, 4))
+
+    print("Margin of error:",
+          round(margin_error, 4))
+
+    print("\nConfidence Interval:")
+    print("Lower limit:", round(lower, 4))
+    print("Upper limit:", round(upper, 4))
+
+    # Precision check
+    if margin_error <= precision:
+        print("\nThe required level of precision is achieved.")
+    else:
+        print("\nThe required level of precision is NOT achieved.")
+        print("Consider increasing the sample size.")
