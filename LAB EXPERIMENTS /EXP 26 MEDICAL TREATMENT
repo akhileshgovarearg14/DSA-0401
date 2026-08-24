@@ -1,0 +1,88 @@
+26.Scenario: You are a researcher working in a medical lab, investigating the effectiveness of a new
+treatment for a specific disease. You have collected data from a clinical trial with two groups: a control
+
+group receiving a placebo, and a treatment group receiving the new drug.Your goal is to analyze the
+data using hypothesis testing and calculate the p-value to determine if the new treatment has a
+statistically significant effect compared to the placebo. You will use the matplotlib library to visualize
+the data and the p-value.
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import ttest_ind
+
+# Runtime input
+n_control = int(input("Enter number of patients in control group: "))
+
+control = list(map(float, input(
+    f"Enter {n_control} control group values: "
+).split()))
+
+n_treatment = int(input("Enter number of patients in treatment group: "))
+
+treatment = list(map(float, input(
+    f"Enter {n_treatment} treatment group values: "
+).split()))
+
+# Check input
+if len(control) != n_control or len(treatment) != n_treatment:
+    print("Error: Number of values does not match sample size.")
+
+else:
+    # Calculate means
+    control_mean = np.mean(control)
+    treatment_mean = np.mean(treatment)
+
+    # Independent t-test
+    t_stat, p_value = ttest_ind(
+        control,
+        treatment,
+        equal_var=False
+    )
+
+    alpha = 0.05
+
+    # Display results
+    print("\n----- HYPOTHESIS TESTING RESULTS -----")
+
+    print("Control group mean:",
+          round(control_mean, 2))
+
+    print("Treatment group mean:",
+          round(treatment_mean, 2))
+
+    print("t-statistic:",
+          round(t_stat, 4))
+
+    print("p-value:",
+          round(p_value, 4))
+
+    print("Significance level:", alpha)
+
+    if p_value < alpha:
+        print("\nResult: Reject the null hypothesis.")
+        print("The treatment has a statistically significant effect.")
+    else:
+        print("\nResult: Fail to reject the null hypothesis.")
+        print("The treatment does not have a statistically significant effect.")
+
+    # Visualization
+    plt.figure(figsize=(8, 5))
+
+    plt.boxplot(
+        [control, treatment],
+        labels=["Control", "Treatment"]
+    )
+
+    plt.ylabel("Treatment Measurement")
+    plt.title("Control vs Treatment Group")
+
+    # Display p-value on graph
+    plt.text(
+        1.5,
+        max(max(control), max(treatment)),
+        "p-value = " + str(round(p_value, 4)),
+        ha="center"
+    )
+
+    plt.grid(axis="y")
+    plt.show()
