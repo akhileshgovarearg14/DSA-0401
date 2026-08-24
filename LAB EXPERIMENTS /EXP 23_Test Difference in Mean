@@ -1,0 +1,49 @@
+23. Scenario: You are a data scientist working for an e-commerce company. The marketing team has
+conducted an A/B test to evaluate the effectiveness of two different website designs (A and B) in terms
+of conversion rate. They randomly divided the website visitors into two groups, with one group
+experiencing design A and the other experiencing design B. After a week of data collection, you now
+have the conversion rate data for both groups. You want to determine whether there is a statistically
+significant difference in the mean conversion rates between the two website designs.
+Question:
+"Based on the data collected from the A/B test, is there a statistically significant difference in the mean
+conversion rates between website design A and website design B?"
+
+import numpy as np
+from scipy.stats import ttest_ind
+
+# Runtime input
+n_a = int(input("Enter number of visitors for Design A: "))
+a = list(map(float, input(
+    f"Enter conversion rates for {n_a} visitors in Design A: "
+).split()))
+
+n_b = int(input("Enter number of visitors for Design B: "))
+b = list(map(float, input(
+    f"Enter conversion rates for {n_b} visitors in Design B: "
+).split()))
+
+# Check input
+if len(a) != n_a or len(b) != n_b:
+    print("Error: Number of values does not match the sample size.")
+else:
+    # Calculate means
+    mean_a = np.mean(a)
+    mean_b = np.mean(b)
+
+    # Independent two-sample t-test
+    t_stat, p_value = ttest_ind(a, b, equal_var=False)
+
+    alpha = 0.05
+
+    print("\n----- A/B TEST RESULTS -----")
+    print("Mean conversion rate - Design A:", round(mean_a, 2))
+    print("Mean conversion rate - Design B:", round(mean_b, 2))
+    print("t-statistic:", round(t_stat, 4))
+    print("p-value:", round(p_value, 4))
+
+    if p_value < alpha:
+        print("\nResult: There is a statistically significant difference")
+        print("between Design A and Design B.")
+    else:
+        print("\nResult: There is no statistically significant difference")
+        print("between Design A and Design B.")
