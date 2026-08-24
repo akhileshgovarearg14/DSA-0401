@@ -1,0 +1,65 @@
+25.Scenario: Imagine you are an analyst for a popular online shopping website. Your task is to analyze
+customer reviews and provide insights on the average rating and customer satisfaction level for a
+specific product category.
+Question:
+• You will use the pandas library to calculate confidence intervals to estimate the true population
+mean rating.
+• You have been provided with a CSV file named "customer_reviews.csv," which contains
+customer ratings for products in the chosen category.
+
+import pandas as pd
+import numpy as np
+from scipy.stats import t
+
+# Read CSV file
+data = pd.read_csv("customer_reviews.csv")
+
+# Display data
+print("Customer Reviews Data:")
+print(data)
+
+# Get rating column
+ratings = data["Rating"].dropna()
+
+# Runtime input
+confidence = float(input("\nEnter confidence level (example: 95): "))
+
+# Sample statistics
+n = len(ratings)
+mean_rating = ratings.mean()
+std_rating = ratings.std()
+
+# Significance level
+alpha = 1 - confidence / 100
+
+# t critical value
+t_value = t.ppf(1 - alpha / 2, df=n - 1)
+
+# Standard error
+standard_error = std_rating / np.sqrt(n)
+
+# Margin of error
+margin_error = t_value * standard_error
+
+# Confidence interval
+lower = mean_rating - margin_error
+upper = mean_rating + margin_error
+
+# Output
+print("\n----- CUSTOMER RATING ANALYSIS -----")
+print("Number of reviews:", n)
+print("Mean rating:", round(mean_rating, 2))
+print("Standard deviation:", round(std_rating, 2))
+print("Margin of error:", round(margin_error, 2))
+
+print("\n", confidence, "% Confidence Interval:")
+print("Lower limit:", round(lower, 2))
+print("Upper limit:", round(upper, 2))
+
+# Satisfaction level
+if mean_rating >= 4:
+    print("\nCustomer Satisfaction Level: HIGH")
+elif mean_rating >= 3:
+    print("\nCustomer Satisfaction Level: MODERATE")
+else:
+    print("\nCustomer Satisfaction Level: LOW")
