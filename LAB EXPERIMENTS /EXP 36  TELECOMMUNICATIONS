@@ -1,0 +1,167 @@
+36.Scenario: Logistic Regression for Customer Churn Prediction
+You are working for a telecommunications company, and you want to predict whether a customer will
+churn (leave the company) based on their usage patterns and demographic data. You have collected a
+dataset of past customers with their churn status (0 for not churned, 1 for churned) and various features.
+Write a Python program that allows the user to input the features (e.g., usage minutes, contract
+duration) of a new customer. The program should use logistic regression from scikit-learn to predict
+whether the new customer will churn or not based on the input features.
+
+# Experiment 36
+# Logistic Regression for Customer Churn Prediction
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score
+
+# --------------------------------------------------
+# STEP 1: Get number of customers
+# --------------------------------------------------
+
+n = int(input("Enter number of customers: "))
+
+data = []
+
+print("\nEnter customer details:")
+print("Churn: 0 = Not Churned, 1 = Churned")
+
+for i in range(n):
+
+    print("\nCustomer", i + 1)
+
+    usage = float(input("Enter Monthly Usage Minutes: "))
+    contract = float(input("Enter Contract Duration (months): "))
+    calls = float(input("Enter Number of Calls per Month: "))
+    complaints = float(input("Enter Number of Complaints: "))
+    churn = int(input("Enter Churn Status (0/1): "))
+
+    data.append([
+        usage,
+        contract,
+        calls,
+        complaints,
+        churn
+    ])
+
+# --------------------------------------------------
+# STEP 2: Create DataFrame
+# --------------------------------------------------
+
+df = pd.DataFrame(data, columns=[
+    "Usage_Minutes",
+    "Contract_Months",
+    "Monthly_Calls",
+    "Complaints",
+    "Churn"
+])
+
+print("\n========== CUSTOMER DATA ==========")
+print(df)
+
+# --------------------------------------------------
+# STEP 3: Separate features and target
+# --------------------------------------------------
+
+X = df[
+    [
+        "Usage_Minutes",
+        "Contract_Months",
+        "Monthly_Calls",
+        "Complaints"
+    ]
+]
+
+y = df["Churn"]
+
+# --------------------------------------------------
+# STEP 4: Split dataset
+# --------------------------------------------------
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    random_state=42,
+    stratify=y
+)
+
+# --------------------------------------------------
+# STEP 5: Standardize features
+# --------------------------------------------------
+
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# --------------------------------------------------
+# STEP 6: Create Logistic Regression model
+# --------------------------------------------------
+
+model = LogisticRegression()
+
+model.fit(X_train, y_train)
+
+# --------------------------------------------------
+# STEP 7: Test the model
+# --------------------------------------------------
+
+y_pred = model.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_pred)
+
+print("\n========== MODEL PERFORMANCE ==========")
+print("Accuracy:", round(accuracy * 100, 2), "%")
+
+# --------------------------------------------------
+# STEP 8: Display actual vs predicted
+# --------------------------------------------------
+
+results = pd.DataFrame({
+    "Actual Churn": y_test.values,
+    "Predicted Churn": y_pred
+})
+
+print("\n========== TEST SET PREDICTIONS ==========")
+print(results.to_string(index=False))
+
+# --------------------------------------------------
+# STEP 9: New customer prediction
+# --------------------------------------------------
+
+print("\n========== NEW CUSTOMER PREDICTION ==========")
+
+usage = float(input("Enter Monthly Usage Minutes: "))
+contract = float(input("Enter Contract Duration (months): "))
+calls = float(input("Enter Number of Calls per Month: "))
+complaints = float(input("Enter Number of Complaints: "))
+
+new_customer = [[
+    usage,
+    contract,
+    calls,
+    complaints
+]]
+
+# Scale new customer data
+new_customer_scaled = scaler.transform(new_customer)
+
+# Predict
+prediction = model.predict(new_customer_scaled)
+
+# Probability
+probability = model.predict_proba(new_customer_scaled)
+
+print("\n========== RESULT ==========")
+
+if prediction[0] == 1:
+    print("Prediction: Customer is likely to CHURN")
+else:
+    print("Prediction: Customer is NOT likely to CHURN")
+
+print("Probability of Churn:",
+      round(probability[0][1] * 100, 2), "%")
+
+print("Probability of Not Churn:",
+      round(probability[0][0] * 100, 2), "%")
