@@ -1,0 +1,138 @@
+40. Scenario: You work as a data scientist for a marketing agency, and one of your clients is a large
+e-commerce company. The company wants to understand the purchasing behavior of its customers and
+segment them into different groups based on their buying patterns. The e-commerce company has
+provided you with transaction data, including customer IDs, the total amount spent in each transaction,
+and the number of items purchased.
+Question: Build a clustering model using the K-Means algorithm to group customers based on their
+spending and purchase behavior and visualize the clusters using scatter plots or other appropriate
+visualizations to gain insights into customer distribution and distinguish different segments.
+
+# Experiment 40: E-Commerce Customer Segmentation using K-Means
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# Step 1: Get number of customers
+n = int(input("Enter number of customers: "))
+
+customer_id = []
+total_spent = []
+items_purchased = []
+
+# Step 2: Runtime input
+for i in range(n):
+    print("\nCustomer", i + 1)
+
+    cid = input("Enter Customer ID: ")
+    spent = float(input("Enter Total Amount Spent: "))
+    items = int(input("Enter Number of Items Purchased: "))
+
+    customer_id.append(cid)
+    total_spent.append(spent)
+    items_purchased.append(items)
+
+# Step 3: Create DataFrame
+data = pd.DataFrame({
+    "Customer_ID": customer_id,
+    "Total_Spent": total_spent,
+    "Items_Purchased": items_purchased
+})
+
+print("\nCustomer Transaction Data:")
+print(data)
+
+# Step 4: Select features for clustering
+X = data[["Total_Spent", "Items_Purchased"]]
+
+# Step 5: Standardize the data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Step 6: Get number of clusters
+k = int(input("\nEnter number of clusters (K): "))
+
+# Step 7: Apply K-Means
+kmeans = KMeans(
+    n_clusters=k,
+    random_state=42,
+    n_init=10
+)
+
+data["Cluster"] = kmeans.fit_predict(X_scaled) + 1
+
+# Step 8: Display clustered data
+print("\nCustomer Segmentation Result:")
+print(data)
+
+# Step 9: Calculate cluster centers
+centers_scaled = kmeans.cluster_centers_
+centers = scaler.inverse_transform(centers_scaled)
+
+center_data = pd.DataFrame(
+    centers,
+    columns=["Total_Spent", "Items_Purchased"]
+)
+
+center_data.index = range(1, k + 1)
+
+print("\nCluster Centers:")
+print(center_data)
+
+# Step 10: Display number of customers in each cluster
+print("\nNumber of Customers in Each Cluster:")
+print(data["Cluster"].value_counts().sort_index())
+
+# Step 11: Visualize clusters
+plt.figure(figsize=(9, 6))
+
+plt.scatter(
+    data["Total_Spent"],
+    data["Items_Purchased"],
+    c=data["Cluster"],
+    cmap="viridis",
+    s=100
+)
+
+# Plot cluster centers
+plt.scatter(
+    center_data["Total_Spent"],
+    center_data["Items_Purchased"],
+    marker="X",
+    s=250,
+    edgecolors="black",
+    label="Cluster Centers"
+)
+
+# Add customer IDs
+for i in range(len(data)):
+    plt.annotate(
+        data["Customer_ID"].iloc[i],
+        (data["Total_Spent"].iloc[i],
+         data["Items_Purchased"].iloc[i]),
+        xytext=(5, 5),
+        textcoords="offset points"
+    )
+
+plt.xlabel("Total Amount Spent")
+plt.ylabel("Number of Items Purchased")
+plt.title("E-Commerce Customer Segmentation using K-Means")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Step 12: Predict cluster for a new customer
+print("\nEnter details of a new customer:")
+
+new_id = input("Enter Customer ID: ")
+new_spent = float(input("Enter Total Amount Spent: "))
+new_items = int(input("Enter Number of Items Purchased: "))
+
+new_customer = [[new_spent, new_items]]
+new_scaled = scaler.transform(new_customer)
+
+new_cluster = kmeans.predict(new_scaled)[0] + 1
+
+print("\nNew Customer ID:", new_id)
+print("Predicted Customer Segment:", new_cluster)
