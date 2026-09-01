@@ -1,0 +1,148 @@
+33. Scenario: You work as a data scientist for a real estate company. The company has collected data
+on various houses, including features such as the size of the house, number of bedrooms, location, and
+other relevant attributes. The marketing team wants to build a predictive model to estimate the price
+of houses based on their features. They believe that linear regression modelling can be an effective
+approach for this task.
+Question:Your task is write a Python program to perform bivariate analysis and build a linear
+regression model to predict house prices based on a selected feature (e.g., house size) from the dataset.
+Additionally, you need to evaluate the model's performance to ensure its accuracy and reliability.
+
+# Experiment 33
+# Bivariate Analysis and Linear Regression
+# House Size vs House Price
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# ---------------------------------------------------
+# STEP 1: Runtime input
+# ---------------------------------------------------
+
+n = int(input("Enter number of houses: "))
+
+data = []
+
+print("\nEnter house details:")
+
+for i in range(n):
+    print("\nHouse", i + 1)
+
+    size = float(input("Enter House Size (sq.ft): "))
+    price = float(input("Enter House Price: "))
+
+    data.append([size, price])
+
+# ---------------------------------------------------
+# STEP 2: Create DataFrame
+# ---------------------------------------------------
+
+df = pd.DataFrame(data, columns=["Size", "Price"])
+
+print("\n========== HOUSE DATA ==========")
+print(df)
+
+# ---------------------------------------------------
+# STEP 3: Bivariate Analysis
+# ---------------------------------------------------
+
+correlation = df["Size"].corr(df["Price"])
+
+print("\n========== BIVARIATE ANALYSIS ==========")
+print("Correlation between Size and Price:",
+      round(correlation, 4))
+
+# ---------------------------------------------------
+# STEP 4: Scatter Plot
+# ---------------------------------------------------
+
+plt.scatter(df["Size"], df["Price"])
+
+plt.xlabel("House Size (sq.ft)")
+plt.ylabel("House Price")
+plt.title("Bivariate Analysis: House Size vs Price")
+
+plt.show()
+
+# ---------------------------------------------------
+# STEP 5: Separate X and Y
+# ---------------------------------------------------
+
+X = df[["Size"]]
+y = df["Price"]
+
+# ---------------------------------------------------
+# STEP 6: Split data
+# ---------------------------------------------------
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42
+)
+
+# ---------------------------------------------------
+# STEP 7: Build Linear Regression Model
+# ---------------------------------------------------
+
+model = LinearRegression()
+
+model.fit(X_train, y_train)
+
+# ---------------------------------------------------
+# STEP 8: Predict test data
+# ---------------------------------------------------
+
+y_pred = model.predict(X_test)
+
+# ---------------------------------------------------
+# STEP 9: Evaluate Model
+# ---------------------------------------------------
+
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("\n========== MODEL EVALUATION ==========")
+
+print("Mean Squared Error (MSE):", round(mse, 2))
+print("R² Score:", round(r2, 4))
+
+# ---------------------------------------------------
+# STEP 10: Display Actual vs Predicted
+# ---------------------------------------------------
+
+results = pd.DataFrame({
+    "Actual Price": y_test.values,
+    "Predicted Price": y_pred
+})
+
+print("\n========== TEST SET RESULTS ==========")
+print(results.to_string(index=False))
+
+# ---------------------------------------------------
+# STEP 11: Regression Equation
+# ---------------------------------------------------
+
+print("\n========== REGRESSION EQUATION ==========")
+
+print(
+    "Price =",
+    round(model.coef_[0], 2),
+    "* Size +",
+    round(model.intercept_, 2)
+)
+
+# ---------------------------------------------------
+# STEP 12: Predict new house price
+# ---------------------------------------------------
+
+print("\n========== NEW HOUSE PREDICTION ==========")
+
+new_size = float(input("Enter new house size (sq.ft): "))
+
+new_price = model.predict([[new_size]])
+
+print("Predicted House Price:",
+      round(new_price[0], 2))
