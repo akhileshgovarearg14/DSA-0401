@@ -1,0 +1,141 @@
+31. Scenario: Suppose you are working as a data scientist for a medical research organization. Your
+team has collected data on patients with a certain medical condition and their treatment outcomes. The
+dataset includes various features such as age, gender, blood pressure, cholesterol levels, and whether
+the patient responded positively ("Good") or negatively ("Bad") to the treatment. The organization
+wants to use this model to identify potential candidates who are likely to respond positively to the
+treatment and improve their medical approach.
+
+Question: Your task is to build a classification model using the KNN algorithm to predict the treatment
+outcome ("Good" or "Bad") for new patients based on their features. Evaluate the model's performance
+using accuracy, precision, recall, and F1-score.Make predictions on the test set and display the results.
+
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+# --------------------------------------------------
+# STEP 1: Get number of patients
+# --------------------------------------------------
+
+n = int(input("Enter number of patients: "))
+
+data = []
+
+print("\nEnter patient details:")
+print("Gender: Male/Female")
+print("Outcome: Good/Bad\n")
+
+for i in range(n):
+    print("Patient", i + 1)
+
+    age = int(input("Enter Age: "))
+    gender = input("Enter Gender: ")
+    bp = float(input("Enter Blood Pressure: "))
+    cholesterol = float(input("Enter Cholesterol: "))
+    outcome = input("Enter Treatment Outcome (Good/Bad): ")
+
+    data.append([age, gender, bp, cholesterol, outcome])
+    print()
+
+# --------------------------------------------------
+# STEP 2: Create DataFrame
+# --------------------------------------------------
+
+df = pd.DataFrame(data, columns=[
+    'Age',
+    'Gender',
+    'BloodPressure',
+    'Cholesterol',
+    'Outcome'
+])
+
+print("\nPatient Dataset:")
+print(df)
+
+# --------------------------------------------------
+# STEP 3: Encode categorical values
+# --------------------------------------------------
+
+gender_encoder = LabelEncoder()
+outcome_encoder = LabelEncoder()
+
+df['Gender'] = gender_encoder.fit_transform(df['Gender'])
+df['Outcome'] = outcome_encoder.fit_transform(df['Outcome'])
+
+# --------------------------------------------------
+# STEP 4: Separate features and target
+# --------------------------------------------------
+
+X = df[['Age', 'Gender', 'BloodPressure', 'Cholesterol']]
+y = df['Outcome']
+
+# --------------------------------------------------
+# STEP 5: Split dataset
+# --------------------------------------------------
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    random_state=42,
+    stratify=y
+)
+
+# --------------------------------------------------
+# STEP 6: Standardize data
+# --------------------------------------------------
+
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# --------------------------------------------------
+# STEP 7: Create KNN model
+# --------------------------------------------------
+
+k = int(input("Enter value of K for KNN: "))
+
+knn = KNeighborsClassifier(n_neighbors=k)
+
+knn.fit(X_train, y_train)
+
+# --------------------------------------------------
+# STEP 8: Prediction
+# --------------------------------------------------
+
+y_pred = knn.predict(X_test)
+
+# --------------------------------------------------
+# STEP 9: Performance evaluation
+# --------------------------------------------------
+
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, zero_division=0)
+recall = recall_score(y_test, y_pred, zero_division=0)
+f1 = f1_score(y_test, y_pred, zero_division=0)
+
+print("\n========== MODEL PERFORMANCE ==========")
+
+print("Accuracy  :", round(accuracy * 100, 2), "%")
+print("Precision :", round(precision * 100, 2), "%")
+print("Recall    :", round(recall * 100, 2), "%")
+print("F1-Score  :", round(f1 * 100, 2), "%")
+
+# --------------------------------------------------
+# STEP 10: Display actual and predicted results
+# --------------------------------------------------
+
+actual = outcome_encoder.inverse_transform(y_test)
+predicted = outcome_encoder.inverse_transform(y_pred)
+
+results = pd.DataFrame({
+    'Actual Outcome': actual,
+    'Predicted Outcome': predicted
+})
+
+print("\n========== TEST SET PREDICTIONS ==========")
+print(results.to_string(index=False))
