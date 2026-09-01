@@ -1,0 +1,146 @@
+38. Scenario: You work as a data scientist for an e-commerce company that sells a wide range of
+products online. The company collects vast amounts of data about its customers, including their
+purchase history, browsing behavior, demographics, and more. The marketing team wants to
+understand their customer base better and improve their targeted marketing strategies. They have asked
+you to perform customer segmentation using clustering techniques to identify distinct groups of
+customers with similar characteristics.
+Question: Your task is to use Python and clustering algorithms to segment the customers into different
+groups based on their behavior and characteristics. The marketing team will use these segments to
+tailor their marketing campaigns and promotions effectively.
+
+# Experiment 38
+# Customer Segmentation using K-Means Clustering
+
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# --------------------------------------------------
+# STEP 1: Get number of customers
+# --------------------------------------------------
+
+n = int(input("Enter number of customers: "))
+
+data = []
+
+print("\nEnter customer details:")
+
+for i in range(n):
+
+    print("\nCustomer", i + 1)
+
+    income = float(input("Enter Annual Income: "))
+    spending = float(input("Enter Total Spending: "))
+    purchases = float(input("Enter Number of Purchases: "))
+    browsing = float(input("Enter Browsing Hours per Month: "))
+
+    data.append([
+        income,
+        spending,
+        purchases,
+        browsing
+    ])
+
+# --------------------------------------------------
+# STEP 2: Create DataFrame
+# --------------------------------------------------
+
+df = pd.DataFrame(data, columns=[
+    "Income",
+    "Spending",
+    "Purchases",
+    "Browsing_Hours"
+])
+
+print("\n========== CUSTOMER DATA ==========")
+print(df)
+
+# --------------------------------------------------
+# STEP 3: Standardize the data
+# --------------------------------------------------
+
+scaler = StandardScaler()
+
+X_scaled = scaler.fit_transform(df)
+
+# --------------------------------------------------
+# STEP 4: Select number of clusters
+# --------------------------------------------------
+
+k = int(input("\nEnter number of customer segments: "))
+
+# --------------------------------------------------
+# STEP 5: Apply K-Means
+# --------------------------------------------------
+
+kmeans = KMeans(
+    n_clusters=k,
+    random_state=42,
+    n_init=10
+)
+
+kmeans.fit(X_scaled)
+
+# --------------------------------------------------
+# STEP 6: Assign cluster labels
+# --------------------------------------------------
+
+df["Segment"] = kmeans.labels_ + 1
+
+print("\n========== CUSTOMER SEGMENTS ==========")
+print(df)
+
+# --------------------------------------------------
+# STEP 7: Display cluster centers
+# --------------------------------------------------
+
+centers = scaler.inverse_transform(kmeans.cluster_centers_)
+
+center_df = pd.DataFrame(
+    centers,
+    columns=[
+        "Income",
+        "Spending",
+        "Purchases",
+        "Browsing_Hours"
+    ]
+)
+
+center_df.index = center_df.index + 1
+
+print("\n========== SEGMENT CENTERS ==========")
+print(center_df)
+
+# --------------------------------------------------
+# STEP 8: New customer input
+# --------------------------------------------------
+
+print("\n========== NEW CUSTOMER ==========")
+
+income = float(input("Enter Annual Income: "))
+spending = float(input("Enter Total Spending: "))
+purchases = float(input("Enter Number of Purchases: "))
+browsing = float(input("Enter Browsing Hours per Month: "))
+
+new_customer = [[
+    income,
+    spending,
+    purchases,
+    browsing
+]]
+
+# --------------------------------------------------
+# STEP 9: Scale new customer
+# --------------------------------------------------
+
+new_customer_scaled = scaler.transform(new_customer)
+
+# --------------------------------------------------
+# STEP 10: Predict segment
+# --------------------------------------------------
+
+segment = kmeans.predict(new_customer_scaled)
+
+print("\n========== PREDICTION ==========")
+print("New Customer belongs to Segment:",
+      segment[0] + 1)
